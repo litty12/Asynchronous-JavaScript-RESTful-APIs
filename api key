@@ -1,0 +1,132 @@
+const API_KEY = "c53def475b1392409cc193f2181db6bb";
+
+const form =
+    document.getElementById("search-form");
+
+const cityInput =
+    document.getElementById("city-input");
+
+const weatherCard =
+    document.getElementById("weather-card");
+
+const message =
+    document.getElementById("message");
+
+const cityName =
+    document.getElementById("city-name");
+
+const temperature =
+    document.getElementById("temperature");
+
+const humidity =
+    document.getElementById("humidity");
+
+const windSpeed =
+    document.getElementById("wind-speed");
+
+const condition =
+    document.getElementById("condition");
+
+/* =========================
+   FETCH WEATHER DATA
+========================= */
+
+async function getWeather(city) {
+
+    try {
+
+        message.textContent =
+            "Loading weather data...";
+
+        weatherCard.classList.add("hidden");
+
+        const url =
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+        const response =
+            await fetch(url);
+
+        if (!response.ok) {
+
+            throw new Error(
+                "City not found"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        renderWeather(data);
+
+        message.textContent = "";
+
+    } catch (error) {
+
+        weatherCard.classList.add(
+            "hidden"
+        );
+
+        message.textContent =
+            error.message;
+    }
+}
+
+/* =========================
+   RENDER JSON DATA
+========================= */
+
+function renderWeather(data) {
+
+    /*
+       Example JSON Structure:
+
+       data.main.temp
+       data.main.humidity
+       data.wind.speed
+       data.weather[0].description
+    */
+
+    cityName.textContent =
+        `${data.name}, ${data.sys.country}`;
+
+    temperature.textContent =
+        `${data.main.temp} °C`;
+
+    humidity.textContent =
+        `${data.main.humidity}%`;
+
+    windSpeed.textContent =
+        `${data.wind.speed} m/s`;
+
+    condition.textContent =
+        data.weather[0].description;
+
+    weatherCard.classList.remove(
+        "hidden"
+    );
+}
+
+/* =========================
+   SEARCH FORM
+========================= */
+
+form.addEventListener(
+    "submit",
+    (event) => {
+
+        event.preventDefault();
+
+        const city =
+            cityInput.value.trim();
+
+        if (!city) {
+
+            message.textContent =
+                "Please enter a city.";
+
+            return;
+        }
+
+        getWeather(city);
+    }
+);
